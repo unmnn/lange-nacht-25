@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The tidyverse</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="tidyverse_files/libs/clipboard/clipboard.min.js"></script>
+<script src="tidyverse_files/libs/quarto-html/quarto.js"></script>
+<script src="tidyverse_files/libs/quarto-html/popper.min.js"></script>
+<script src="tidyverse_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="tidyverse_files/libs/quarto-html/anchor.min.js"></script>
+<link href="tidyverse_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="tidyverse_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="tidyverse_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="tidyverse_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="tidyverse_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">The tidyverse</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p><img src="figures/03-tidyverse.png" class="img-fluid" style="float:right;" width="201"> “The tidyverse is an <strong>opinionated collection of R packages designed for data science</strong>. All packages share an underlying <strong>design philosophy, grammar, and data structures</strong>.” – <a href="https://www.tidyverse.org/" class="uri">https://www.tidyverse.org/</a></p>
+</blockquote>
+<section id="case-study-customer-bookings-data" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-customer-bookings-data">Case study: customer bookings data</h2>
+<p>A travel price aggregator website company wants to analyze its booking data to optimize the website’s usability and thus improve their customers’ travel experience.</p>
+<p>The data<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> is organized into two files:</p>
+<ul>
+<li><code>bookings.csv</code>: hotel bookings</li>
+<li><code>properties.csv</code>: hotel facilities</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-expedia.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<section id="load-tidyverse-packages" class="level3">
+<h3 class="anchored" data-anchor-id="load-tidyverse-packages">Load tidyverse packages</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.0.4     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+</div>
+<p>The tidyverse contains 30 packages. When running <code>library(tidyverse)</code>, only the <strong>core</strong> <a href="https://www.tidyverse.org/packages/">tidyverse packages</a> become available in your current <code>R</code> session.</p>
+<p>The core packages are:</p>
+<ul>
+<li><code>ggplot2</code>: creation of graphics</li>
+<li><code>dplyr</code>: data wrangling</li>
+<li><code>tidyr</code>: data reshaping</li>
+<li><code>readr</code>: import of flat data files, e.g.&nbsp;csv</li>
+<li><code>tibble</code>: enhanced data frames</li>
+<li><code>stringr</code>: string manipulation</li>
+<li><code>forcats</code>: factor manipulation</li>
+<li><code>purrr</code>: functions for working with list columns</li>
+<li><code>lubridate</code>: functions for working with date-time columns</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-tidyverse_overview.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption>Tidyverse packages for common activities of a data science workflow.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></figcaption>
+</figure>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/bookings.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 10000 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): booker_id, checkin_day, status
+dbl (4): property_id, room_nights, price_per_night, review_score
+lgl (1): for_business
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bookings</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 215934017ba…        2668           4            91.5 mon         FALSE       
+ 2 7f590fd6d31…        4656           5           107.  tue         FALSE       
+ 3 10f0f138e8b…        4563           6            87.0 wed         FALSE       
+ 4 7b55021a416…        4088           7            92.4 fri         FALSE       
+ 5 6694a79d158…        2188           4           105.  tue         FALSE       
+ 6 d0358740d5f…        4171           2           110.  fri         FALSE       
+ 7 944e568a0b5…        2907           4           116.  fri         FALSE       
+ 8 95476c2ef6b…        5141           4           111.  wed         FALSE       
+ 9 df235631a4c…        1696           1           106.  wed         FALSE       
+10 ff610140227…        1901           7            82.3 sat         FALSE       
+# ℹ 9,990 more rows
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>Get an overview wit <code>glimpse()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bookings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 10,000
+Columns: 8
+$ booker_id       &lt;chr&gt; "215934017ba98c09f30dedd29237b43dad5c7b5f", "7f590fd6d…
+$ property_id     &lt;dbl&gt; 2668, 4656, 4563, 4088, 2188, 4171, 2907, 5141, 1696, …
+$ room_nights     &lt;dbl&gt; 4, 5, 6, 7, 4, 2, 4, 4, 1, 7, 1, 9, 6, 4, 5, 5, 2, 2, …
+$ price_per_night &lt;dbl&gt; 91.46696, 106.50500, 86.99137, 92.36562, 104.83894, 10…
+$ checkin_day     &lt;chr&gt; "mon", "tue", "wed", "fri", "tue", "fri", "fri", "wed"…
+$ for_business    &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE…
+$ status          &lt;chr&gt; "cancelled", "cancelled", "stayed", "stayed", "stayed"…
+$ review_score    &lt;dbl&gt; NA, NA, 6.258123, 5.953598, 6.434745, NA, 7.599461, NA…</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-wrangling-with-dplyr" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling-with-dplyr">Data wrangling with <code>dplyr</code></h2>
+<blockquote class="blockquote">
+<p>dplyr is a grammar of data manipulation, providing a consistent set of verbs that help you solve the most common data manipulation challenges. – <a href="https://dplyr.tidyverse.org/" class="uri">https://dplyr.tidyverse.org/</a></p>
+</blockquote>
+<ul>
+<li>get an overview of a tibble with <code>glimpse()</code></li>
+<li>select a subset of columns with <code>select()</code></li>
+<li>filter a subset of rows with <code>filter()</code></li>
+<li>add new or change existing columns with <code>mutate()</code></li>
+<li>pick a subset of rows with <code>slice()</code></li>
+<li>reorder rows with <code>arrange()</code></li>
+<li>group rows by a grouping column with <code>group_by()</code></li>
+<li>calculate a summary (per group) with <code>summarize()</code></li>
+<li>join two distinct tibbles by a common column with <code>*join()</code></li>
+<li>… (and more)</li>
+</ul>
+<section id="select-columns-with-select" class="level3">
+<h3 class="anchored" data-anchor-id="select-columns-with-select">Select columns with <code>select()</code></h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-dplyr_select.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<p>Select the column <code>review_score</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(bookings, review_score)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 1
+   review_score
+          &lt;dbl&gt;
+ 1        NA   
+ 2        NA   
+ 3         6.26
+ 4         5.95
+ 5         6.43
+ 6        NA   
+ 7         7.60
+ 8        NA   
+ 9         6.97
+10        NA   
+# ℹ 9,990 more rows</code></pre>
+</div>
+</div>
+<p>The output is <strong>always</strong> a <code>data.frame</code> / <code>tibble</code>, regardless of whether a single or multiple columns are selected.</p>
+<p>This is in line with the consistent API design of most dplyr functions:</p>
+<ol type="1">
+<li>The first argument is a data frame</li>
+<li>The output is usually also a data frame</li>
+</ol>
+<p>Select multiple columns by specifying column names as additional arguments:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(bookings, review_score, status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 2
+   review_score status   
+          &lt;dbl&gt; &lt;chr&gt;    
+ 1        NA    cancelled
+ 2        NA    cancelled
+ 3         6.26 stayed   
+ 4         5.95 stayed   
+ 5         6.43 stayed   
+ 6        NA    cancelled
+ 7         7.60 stayed   
+ 8        NA    cancelled
+ 9         6.97 stayed   
+10        NA    cancelled
+# ℹ 9,990 more rows</code></pre>
+</div>
+</div>
+<p>Exclude columns with negative selection: select all but specific columns using <code>-</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(bookings, <span class="sc">-</span>booker_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 7
+   property_id room_nights price_per_night checkin_day for_business status   
+         &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;        &lt;chr&gt;    
+ 1        2668           4            91.5 mon         FALSE        cancelled
+ 2        4656           5           107.  tue         FALSE        cancelled
+ 3        4563           6            87.0 wed         FALSE        stayed   
+ 4        4088           7            92.4 fri         FALSE        stayed   
+ 5        2188           4           105.  tue         FALSE        stayed   
+ 6        4171           2           110.  fri         FALSE        cancelled
+ 7        2907           4           116.  fri         FALSE        stayed   
+ 8        5141           4           111.  wed         FALSE        cancelled
+ 9        1696           1           106.  wed         FALSE        stayed   
+10        1901           7            82.3 sat         FALSE        cancelled
+# ℹ 9,990 more rows
+# ℹ 1 more variable: review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="helper-functions-for-select" class="level3">
+<h3 class="anchored" data-anchor-id="helper-functions-for-select">Helper functions for <code>select()</code></h3>
+<p><strong>Helper functions</strong> make it easy to select multiple columns whose names match a particular criterion.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Helper function</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>contains("abc")</code></td>
+<td style="text-align: left;">Names containing <code>"abc"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>starts_with("abc")</code></td>
+<td style="text-align: left;">Names starting with <code>"abc"</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>ends_with("abc")</code></td>
+<td style="text-align: left;">Names ending with <code>"abc"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>num_range("a", 1:3)</code></td>
+<td style="text-align: left;">Names matching the numerical range <code>a1</code>, <code>a2</code>, <code>a3</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>any_of(c("ab", "c"))</code></td>
+<td style="text-align: left;">Any of the names within a character vector</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>all_of(c("ab", "c"))</code></td>
+<td style="text-align: left;">All of the names within a character vector</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>matches(".id")</code></td>
+<td style="text-align: left;">Names matching the regular expr. <code>".id"</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>everything()</code></td>
+<td style="text-align: left;">All (remaining) names</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>last_col()</code></td>
+<td style="text-align: left;">Last column</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<blockquote class="blockquote">
+<p>Select all columns whose names either contain ‘id’ or end with ‘night’.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">select</span>(bookings, <span class="fu">contains</span>(<span class="st">"id"</span>), <span class="fu">ends_with</span>(<span class="st">"night"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 3
+   booker_id                                property_id price_per_night
+   &lt;chr&gt;                                          &lt;dbl&gt;           &lt;dbl&gt;
+ 1 215934017ba98c09f30dedd29237b43dad5c7b5f        2668            91.5
+ 2 7f590fd6d318248a48665f7f7db529aca40c84f5        4656           107. 
+ 3 10f0f138e8bb1015d3928f2b7d828cbb50cd0804        4563            87.0
+ 4 7b55021a4160dde65e31963fa55a096535bcad17        4088            92.4
+ 5 6694a79d158c7818cd63831b71bac91286db5aff        2188           105. 
+ 6 d0358740d5f15e85523f94ab8219f25d8c017347        4171           110. 
+ 7 944e568a0b511b9140bcc7c7c80c68c3edd3a86f        2907           116. 
+ 8 95476c2ef6bb9e3c227b46f1283310737fa13b7a        5141           111. 
+ 9 df235631a4c281c01e007b6a4c364e07f5843994        1696           106. 
+10 ff610140227d40d27daa01f0dcd5d64ea82e833d        1901            82.3
+# ℹ 9,990 more rows</code></pre>
+</div>
+</div>
+</section>
+<section id="filter-rows-with-filter" class="level3">
+<h3 class="anchored" data-anchor-id="filter-rows-with-filter">Filter rows with <code>filter()</code></h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-dplyr_filter.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<p>Example:</p>
+<blockquote class="blockquote">
+<p>Filter bookings that were completed and not canceled.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(bookings, status <span class="sc">==</span> <span class="st">"stayed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7,775 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 10f0f138e8b…        4563           6            87.0 wed         FALSE       
+ 2 7b55021a416…        4088           7            92.4 fri         FALSE       
+ 3 6694a79d158…        2188           4           105.  tue         FALSE       
+ 4 944e568a0b5…        2907           4           116.  fri         FALSE       
+ 5 df235631a4c…        1696           1           106.  wed         FALSE       
+ 6 aeff2e2d3d2…        2188           1           109.  wed         FALSE       
+ 7 5a1442f4c72…        2307           9            84.2 sat         FALSE       
+ 8 39804a2e3fb…        2907           6           112.  sun         FALSE       
+ 9 e150e559405…        2870           4           127.  sat         FALSE       
+10 4e9c7c21dfc…        1674           5           102.  sun         FALSE       
+# ℹ 7,765 more rows
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>Combine multiple conditions with <code>&amp;</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  bookings, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  status <span class="sc">==</span> <span class="st">"stayed"</span> <span class="sc">&amp;</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(review_score) <span class="sc">&amp;</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    price_per_night <span class="sc">&gt;=</span> <span class="dv">90</span> <span class="sc">&amp;</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    price_per_night <span class="sc">&lt;=</span> <span class="dv">120</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3,032 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 7b55021a416…        4088           7            92.4 fri         FALSE       
+ 2 6694a79d158…        2188           4           105.  tue         FALSE       
+ 3 944e568a0b5…        2907           4           116.  fri         FALSE       
+ 4 df235631a4c…        1696           1           106.  wed         FALSE       
+ 5 39804a2e3fb…        2907           6           112.  sun         FALSE       
+ 6 4e9c7c21dfc…        1674           5           102.  sun         FALSE       
+ 7 8537874da3f…        4420           2           106.  sat         FALSE       
+ 8 0fcce2f5be8…        1951           3           110.  wed         FALSE       
+ 9 9864af3aba5…        1981           3            96.9 sun         FALSE       
+10 ccd24f99357…        2307           3           115.  fri         FALSE       
+# ℹ 3,022 more rows
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="sort-rows-with-arrange" class="level3">
+<h3 class="anchored" data-anchor-id="sort-rows-with-arrange">Sort rows with <code>arrange()</code></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(bookings, price_per_night) <span class="co"># default: sort in ascending order</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 028c395e745…        3096           1            39.4 tue         FALSE       
+ 2 037bec01b4f…        3619           1            45.8 wed         TRUE        
+ 3 7341b69d8de…        3983           1            47.7 thu         TRUE        
+ 4 cbedb290616…        1172           2            53.2 thu         TRUE        
+ 5 dff926426fd…        4354           6            54.2 fri         FALSE       
+ 6 b28ca9bd608…        3118           2            54.8 sun         TRUE        
+ 7 e2aff0e6df1…        4116           5            55.7 tue         FALSE       
+ 8 28421366c10…        4391           4            56.6 fri         FALSE       
+ 9 a07a0a8a9d8…        4150           2            57.7 sat         FALSE       
+10 97a4a1dcdce…        1172           2            61.0 tue         TRUE        
+# ℹ 9,990 more rows
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">arrange</span>(bookings, <span class="fu">desc</span>(price_per_night))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 3d62487f314…        4931           1            273. tue         TRUE        
+ 2 dc6add0d953…        2305           1            272. fri         TRUE        
+ 3 c57c799c4fa…        5034           1            263. tue         TRUE        
+ 4 0dbc70d94f4…        1819           1            259. fri         TRUE        
+ 5 1d0d33ccf02…        2306           1            257. fri         FALSE       
+ 6 6b70130a6cd…        3916           1            256. tue         TRUE        
+ 7 c478924be4b…        2464           1            255. sun         FALSE       
+ 8 52779fc42be…        3832           1            255. tue         TRUE        
+ 9 23a1258e825…        1971           1            254. tue         TRUE        
+10 58a1a0debac…        2888           1            252. sun         FALSE       
+# ℹ 9,990 more rows
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="select-rows-by-position-with-slice" class="level3">
+<h3 class="anchored" data-anchor-id="select-rows-by-position-with-slice">Select rows by position with <code>slice()</code></h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">arrange</span>(bookings, <span class="fu">desc</span>(review_score))</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">slice</span>(x, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 51c3e2e8552…        1970           3           126.  fri         FALSE       
+ 2 99f91abc431…        2175           1           189.  wed         FALSE       
+ 3 1d7930a998f…        3089           6            77.4 thu         FALSE       
+ 4 58c94e9418f…        3089           5            91.5 sat         FALSE       
+ 5 164c4797e41…        3890           1           232.  sat         TRUE        
+ 6 3119d16c994…        3089           6            93.4 fri         FALSE       
+ 7 10f0f138e8b…        3089           1           175.  sun         FALSE       
+ 8 714d7f95f17…        1855           2           129.  thu         FALSE       
+ 9 b4d77fe4ea2…        3089           2            83.3 sat         FALSE       
+10 68686391598…        3089           5           106.  fri         FALSE       
+# ℹ 2 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">arrange</span>(bookings, <span class="fu">desc</span>(review_score))</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">select</span>(x, review_score, <span class="fu">everything</span>())</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">slice</span>(y, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+   review_score booker_id    property_id room_nights price_per_night checkin_day
+          &lt;dbl&gt; &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;      
+ 1        10    51c3e2e8552…        1970           3           126.  fri        
+ 2        10    99f91abc431…        2175           1           189.  wed        
+ 3         9.92 1d7930a998f…        3089           6            77.4 thu        
+ 4         9.83 58c94e9418f…        3089           5            91.5 sat        
+ 5         9.82 164c4797e41…        3890           1           232.  sat        
+ 6         9.80 3119d16c994…        3089           6            93.4 fri        
+ 7         9.79 10f0f138e8b…        3089           1           175.  sun        
+ 8         9.78 714d7f95f17…        1855           2           129.  thu        
+ 9         9.77 b4d77fe4ea2…        3089           2            83.3 sat        
+10         9.77 68686391598…        3089           5           106.  fri        
+# ℹ 2 more variables: for_business &lt;lgl&gt;, status &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="chaining-multiple-operations" class="level2">
+<h2 class="anchored" data-anchor-id="chaining-multiple-operations">Chaining multiple operations</h2>
+<p>Example:</p>
+<blockquote class="blockquote">
+<p>For all bookers who didn’t cancel their trip and checked in on a friday, we are interested in the 5 highest review scores. Only the columns <code>price_per_night</code> and <code>review_score</code> should be included in a new tibble which is sorted by <code>review_score</code> in descending order.</p>
+</blockquote>
+<section id="the-pipe-operator" class="level3">
+<h3 class="anchored" data-anchor-id="the-pipe-operator">The pipe operator <code>|&gt;</code></h3>
+<ul>
+<li>The <strong>pipe operator</strong> <code>|&gt;</code> is used to pass information from one operation to the next.</li>
+<li>Its main purpose is to <strong>express a sequence of operations</strong>.</li>
+<li>Using the pipe, a function’s output becomes the first argument of the subsequent function.</li>
+<li>Thus, the pipe operator helps to write <strong>code that is easy to read and understand</strong>.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(status <span class="sc">!=</span> <span class="st">"cancelled"</span> <span class="sc">&amp;</span> checkin_day <span class="sc">==</span> <span class="st">"fri"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(review_score)) <span class="sc">|&gt;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(price_per_night, review_score)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  price_per_night review_score
+            &lt;dbl&gt;        &lt;dbl&gt;
+1           126.         10   
+2            93.4         9.80
+3           106.          9.77
+4           148.          9.64
+5           225.          9.49</code></pre>
+</div>
+</div>
+<p>Read:</p>
+<blockquote class="blockquote">
+<p>“From table <code>bookings</code>,<br>
+filter all non-canceled bookings with check-in on a Friday<br>
+THEN sort by review score in descending order<br>
+THEN take the top-5 bookings<br>
+THEN return price per night and review score.”</p>
+</blockquote>
+</section>
+</section>
+<section id="adding-new-columns-with-mutate" class="level2">
+<h2 class="anchored" data-anchor-id="adding-new-columns-with-mutate">Adding new columns with <code>mutate()</code></h2>
+<p>Create a new column for the <strong>total price</strong> of a booking, which is the product of <code>price_per_night</code> and <code>room_nights</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_price =</span> price_per_night <span class="sc">*</span> room_nights)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 9
+   booker_id    property_id room_nights price_per_night checkin_day for_business
+   &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt;       &lt;lgl&gt;       
+ 1 215934017ba…        2668           4            91.5 mon         FALSE       
+ 2 7f590fd6d31…        4656           5           107.  tue         FALSE       
+ 3 10f0f138e8b…        4563           6            87.0 wed         FALSE       
+ 4 7b55021a416…        4088           7            92.4 fri         FALSE       
+ 5 6694a79d158…        2188           4           105.  tue         FALSE       
+ 6 d0358740d5f…        4171           2           110.  fri         FALSE       
+ 7 944e568a0b5…        2907           4           116.  fri         FALSE       
+ 8 95476c2ef6b…        5141           4           111.  wed         FALSE       
+ 9 df235631a4c…        1696           1           106.  wed         FALSE       
+10 ff610140227…        1901           7            82.3 sat         FALSE       
+# ℹ 9,990 more rows
+# ℹ 3 more variables: status &lt;chr&gt;, review_score &lt;dbl&gt;, total_price &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<ul>
+<li>Syntax: mutate(name of new variable = equation)</li>
+<li>Note that a new variable will be appended as the last column of the data frame.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_price =</span> price_per_night <span class="sc">*</span> room_nights, <span class="at">.after =</span> price_per_night)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 9
+   booker_id     property_id room_nights price_per_night total_price checkin_day
+   &lt;chr&gt;               &lt;dbl&gt;       &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;      
+ 1 215934017ba9…        2668           4            91.5        366. mon        
+ 2 7f590fd6d318…        4656           5           107.         533. tue        
+ 3 10f0f138e8bb…        4563           6            87.0        522. wed        
+ 4 7b55021a4160…        4088           7            92.4        647. fri        
+ 5 6694a79d158c…        2188           4           105.         419. tue        
+ 6 d0358740d5f1…        4171           2           110.         220. fri        
+ 7 944e568a0b51…        2907           4           116.         465. fri        
+ 8 95476c2ef6bb…        5141           4           111.         446. wed        
+ 9 df235631a4c2…        1696           1           106.         106. wed        
+10 ff610140227d…        1901           7            82.3        576. sat        
+# ℹ 9,990 more rows
+# ℹ 3 more variables: for_business &lt;lgl&gt;, status &lt;chr&gt;, review_score &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="summarize-many-rows-with-summarize" class="level2">
+<h2 class="anchored" data-anchor-id="summarize-many-rows-with-summarize">Summarize many rows with <code>summarize()</code></h2>
+<p><code>summarize()</code> (or <code>summarise()</code>) performs some kind of aggregation on grouping variables and returns a summary table with fewer rows.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-dplyr_summarize.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<p>A single one-valued stat:</p>
+<blockquote class="blockquote">
+<p>What is the average review score over all bookings?</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">review_score =</span> <span class="fu">mean</span>(review_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  review_score
+         &lt;dbl&gt;
+1         7.22</code></pre>
+</div>
+</div>
+<p>(one row, one column)</p>
+<p>Multiple one-valued stats:</p>
+<blockquote class="blockquote">
+<p>What is the total number of bookings, the number of bookings without review score, and the average review score over all bookings?</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(), <span class="co"># Total no. of bookings</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_miss =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(review_score)), <span class="co"># No. of bookings w/o review score</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">review_score =</span> <span class="fu">mean</span>(review_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co"># Avg. review score</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+      n n_miss review_score
+  &lt;int&gt;  &lt;int&gt;        &lt;dbl&gt;
+1 10000   3817         7.22</code></pre>
+</div>
+</div>
+<p>(one row, multiple columns)</p>
+<p>Multiple n-valued stats:</p>
+<blockquote class="blockquote">
+<p>What is the price range over all bookings?</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reframe</span>(<span class="at">statistic =</span> <span class="fu">c</span>(<span class="st">"min"</span>, <span class="st">"max"</span>), <span class="at">value =</span> <span class="fu">range</span>(price_per_night))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  statistic value
+  &lt;chr&gt;     &lt;dbl&gt;
+1 min        39.4
+2 max       273. </code></pre>
+</div>
+</div>
+<p>(multiple rows, multiple columns)</p>
+<p>Note that <code>summarize()</code> is for one-row summaries only. For multi-row aggregations, we can use <code>reframe()</code>.</p>
+</section>
+<section id="grouping-with-group_by" class="level2">
+<h2 class="anchored" data-anchor-id="grouping-with-group_by">Grouping with <code>group_by()</code></h2>
+<p><code>group_by()</code> lets us perform operations for each <em>group</em> separately.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(for_business) <span class="sc">|&gt;</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">review_avg =</span> <span class="fu">mean</span>(review_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  for_business     n review_avg
+  &lt;lgl&gt;        &lt;int&gt;      &lt;dbl&gt;
+1 FALSE         6285       7.50
+2 TRUE          3715       6.85</code></pre>
+</div>
+</div>
+</section>
+<section id="count-the-number-of-rows-per-group-with-count" class="level2">
+<h2 class="anchored" data-anchor-id="count-the-number-of-rows-per-group-with-count">Count the number of rows per group with <code>count()</code></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(for_business, status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  for_business status        n
+  &lt;lgl&gt;        &lt;chr&gt;     &lt;int&gt;
+1 FALSE        cancelled  1762
+2 FALSE        stayed     4523
+3 TRUE         cancelled   463
+4 TRUE         stayed     3252</code></pre>
+</div>
+</div>
+</section>
+<section id="combining-multiple-data-frames" class="level2">
+<h2 class="anchored" data-anchor-id="combining-multiple-data-frames">Combining multiple data frames</h2>
+<blockquote class="blockquote">
+<p>What is the number of bookings per destination (city)?</p>
+</blockquote>
+<p>To answer this question, we have to combine the two data frames <code>bookings</code> and <code>properties</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>properties <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/properties.csv"</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>properties</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4,178 × 5
+   property_id destination property_type nr_rooms facilities                    
+         &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;                         
+ 1        2668 Brisbane    Hotel               32 airport shuttle,free wifi,gar…
+ 2        4656 Brisbane    Hotel               39 on-site restaurant,pool,airpo…
+ 3        4563 Brisbane    Apartment            9 laundry                       
+ 4        4088 Brisbane    Apartment            9 kitchen,laundry,free wifi     
+ 5        2188 Brisbane    Apartment            4 parking,kitchen,bbq,free wifi…
+ 6        4171 Brisbane    Apartment            5 kitchen,pool,laundry,parking,…
+ 7        2907 Brisbane    Hotel               22 airport shuttle,on-site resta…
+ 8        5141 Brisbane    Hotel               20 breakfast,free wifi,on-site r…
+ 9        1696 Brisbane    Apartment            5 free wifi,laundry,pool,game c…
+10        1901 Brisbane    Apartment           11 free wifi,bbq,laundry,breakfa…
+# ℹ 4,168 more rows</code></pre>
+</div>
+</div>
+<p>Example: <strong>inner join</strong><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<p>Join two data frames <code>x</code> and <code>y</code>. The result is a data frame containing all rows from <code>x</code> with matching values in <code>y</code> for column <code>id</code> and all columns from <code>x</code> and <code>y</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-inner-join.gif" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>bookings <span class="sc">|&gt;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(properties, <span class="at">by =</span> <span class="st">"property_id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(destination)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  destination     n
+  &lt;chr&gt;       &lt;int&gt;
+1 Amsterdam    5000
+2 Brisbane     1000
+3 Tokyo        4000</code></pre>
+</div>
+</div>
+</section>
+<section id="reshape-data-frames-with-tidyr" class="level2">
+<h2 class="anchored" data-anchor-id="reshape-data-frames-with-tidyr">Reshape data frames with <a href="https://tidyr.tidyverse.org/"><code>tidyr</code></a></h2>
+<p>The <code>tidyverse</code> inherits its name from the term <strong>tidy data</strong>. Tidy data refers to a specific standardized dataset structure.</p>
+<p>Characteristics of tidy data:</p>
+<ol type="1">
+<li>Each <strong>variable</strong> must have its own column.</li>
+<li>Each <strong>observation</strong> must have its own row.</li>
+<li>Each <strong>value</strong> must have its own cell.</li>
+</ol>
+<p>Many of the tidyverse functions require a <em>tidy</em> data frame input. The <code>tidyr</code> package contains functions to reshape “messy” into tidy data frames.</p>
+<p>We will often encounter untidy data, as it is sometimes easier to input information into a spreadsheet in a disorganized manner.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-tidyr_long_wide.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+<section id="pivot_longer-and-pivot_wider" class="level3">
+<h3 class="anchored" data-anchor-id="pivot_longer-and-pivot_wider"><code>pivot_longer()</code> and <code>pivot_wider()</code></h3>
+<p><code>tidyr</code>’s two main functions are <code>pivot_longer()</code> and <code>pivot_wider()</code>.</p>
+<ul>
+<li><code>pivot_longer()</code> takes multiple columns and collapses them into <strong>key-value pairs</strong>.</li>
+<li><code>pivot_wider()</code> takes two or more columns (i.e., a key-value pair) and spreads them into <strong>multiple columns</strong>.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/03-tidyr_pivot.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:50.0%"></p>
+</figure>
+</div>
+</section>
+<section id="reshaping-from-long-to-wide" class="level3">
+<h3 class="anchored" data-anchor-id="reshaping-from-long-to-wide">Reshaping from “long” to “wide”</h3>
+<p>Compute the number of bookings per city and day:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>day_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"mon"</span>, <span class="st">"tue"</span>, <span class="st">"wed"</span>, <span class="st">"thu"</span>, <span class="st">"fri"</span>, <span class="st">"sat"</span>, <span class="st">"sun"</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> bookings <span class="sc">|&gt;</span> <span class="fu">inner_join</span>(properties, <span class="at">by =</span> <span class="st">"property_id"</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>checkin_count <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(destination, checkin_day) <span class="sc">|&gt;</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">checkin_day =</span> <span class="fu">factor</span>(checkin_day, <span class="at">levels =</span> day_order)) <span class="sc">|&gt;</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(destination, checkin_day)</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>checkin_count</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21 × 3
+   destination checkin_day     n
+   &lt;chr&gt;       &lt;fct&gt;       &lt;int&gt;
+ 1 Amsterdam   mon           517
+ 2 Amsterdam   tue           498
+ 3 Amsterdam   wed           542
+ 4 Amsterdam   thu           667
+ 5 Amsterdam   fri          1074
+ 6 Amsterdam   sat           889
+ 7 Amsterdam   sun           813
+ 8 Brisbane    mon           133
+ 9 Brisbane    tue           148
+10 Brisbane    wed           128
+# ℹ 11 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>checkin_count <span class="sc">|&gt;</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> checkin_day, <span class="at">values_from =</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 8
+  destination   mon   tue   wed   thu   fri   sat   sun
+  &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+1 Amsterdam     517   498   542   667  1074   889   813
+2 Brisbane      133   148   128   162   162   114   153
+3 Tokyo         718   655   560   718   451   322   576</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>checkin_count <span class="sc">|&gt;</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> checkin_day, <span class="at">values_from =</span> n) <span class="sc">|&gt;</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">-</span>destination, <span class="at">names_to =</span> <span class="st">"checkin_day"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 21 × 3
+   destination checkin_day     n
+   &lt;chr&gt;       &lt;chr&gt;       &lt;int&gt;
+ 1 Amsterdam   mon           517
+ 2 Amsterdam   tue           498
+ 3 Amsterdam   wed           542
+ 4 Amsterdam   thu           667
+ 5 Amsterdam   fri          1074
+ 6 Amsterdam   sat           889
+ 7 Amsterdam   sun           813
+ 8 Brisbane    mon           133
+ 9 Brisbane    tue           148
+10 Brisbane    wed           128
+# ℹ 11 more rows</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="resources" class="level2">
+<h2 class="anchored" data-anchor-id="resources">Resources</h2>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Data source: <a href="https://github.com/drsimonj/tidyverse_tutorial-useR2018/tree/master/data" class="uri">https://github.com/drsimonj/tidyverse_tutorial-useR2018/tree/master/data</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Figure source: <a href="https://rviews.rstudio.com/2017/06/08/what-is-the-tidyverse/" class="uri">https://rviews.rstudio.com/2017/06/08/what-is-the-tidyverse/</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Figure source: <a href="https://github.com/gadenbuie/tidyexplain" class="uri">https://github.com/gadenbuie/tidyexplain</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,450 @@
+---
+title: "Visualizing data with ggplot2"
+format: html
+execute:
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(gapminder)
+library(dplyr)
+library(ggplot2)
+```
+
+
+## The Gapminder dataset
+
+In `R`, most datasets come in the form of data frames:
+
+- Each row is an **observation**.
+- Each column is a **variable**.
+
+Example: The [gapminder](https://www.gapminder.org/data/) dataset, containing global health and economic data for 142 countries between 1952 and 2007 in increments of 5 years.
+
+```{r}
+#| label: gapminder
+gapminder
+```
+
+Example: USA in 2007
+
+```{r}
+#| label: usa-2007
+#| echo: false
+gapminder |> 
+  filter(country == "United States", year == 2007)
+```
+
+## Visualization example: life expectancy vs. GDP
+
+Exploratory data analysis:
+
+* How would you describe the relationship between life expectancy and GDP per capita in 1952? 
+* What other variables could have an influence on the shown trend?
+* Which is the country with moderate life expectancy but extremely high GDP?
+
+```{r}
+#| label: gapminder-life-gdp-outlier
+#| echo: false
+ggplot(
+  data = gapminder |> filter(year == 1952), 
+  mapping = aes(x = gdpPercap, y = lifeExp)
+) +
+  geom_point() +
+  geom_point(data = filter(gapminder, year == 1952, country == "Kuwait"),
+             size = 5, pch = 1, color = "orange", stroke = 3, alpha = 0.8) +
+  labs(
+    x = "GDP per capita (USD)",
+    y = "Life expectancy (years)",
+    title = "Relationship between life expectancy and GDP in 1952"
+  )
+```
+
+In general: the higher the GDP, the higher the life expectancy. However, other factors might explain the variation across the countries: lifestyle, e.g. tobacco and alcohol consumption, lack of exercising, healthcare system. It is difficult to see the trend because of the outlier.
+
+In the mid-twentieth century, Kuwait experienced a period of prosperity called "Golden era" of Kuwait in which the country became the largest oil exporter in the Persian Gulf region by 1952. The visualization helps us to understand our data better and to raise new questions.
+
+## ggplot2
+
+[`ggplot2`](https://ggplot2.tidyverse.org/index.html) is a package for **data visualization** and part of the tidyverse.
+
+* `ggplot2` is inspired by the [**Grammar of Graphics**](https://doi.org/10.1007/0-387-28695-0)
+*  The core idea: **break the graph into components** and **handle each component individually** &rarr; ensure versatility and control
+* A `ggplot2` chart is built by stacking a **series of layers**
+* Advantage: build a **variety of different charts** with the same vocabulary &rarr; code that is easier to read and write
+
+![The grammar of graphics. [(Figure source)](https://medium.com/tdebeus/think-about-the-grammar-of-graphics-when-improving-your-graphs-18e3744d8d18)](figures/02-grammar_of_graphics.gif)
+
+## ggplot2 vocabulary
+
+- **data**: the actual data that is plotted as _tidy_ data frame
+- **aesthetics/mapping**: **map variables to visual properties**
+  - x- and y-coordinates, color, shapes, transparency, line type
+- **geoms** - geometric objects
+  - points, bars, lines, histograms, etc.
+- **stats** - data transformations (often implicit)
+  - counts of categories for bar charts, summary statistics for a boxplot, regression parameters, etc.
+- **scales** - translate between variable ranges and visual properties
+  - which color should represent which category?, should the y-axis be log-transformed?
+- **facets** - spread data onto multiple subplots/panels
+- **coordinates** - change and adjust the coordinate system
+  - cartesian, polar or cartographic coordinate system
+- **themes** - additional visual settings not related to the data
+  - font size or background color
+
+## First ggplot2 visualization
+
+```{r}
+#| label: gapminder-life-gdp-outlier-wo-color
+library(ggplot2) # for plotting
+library(dplyr) # for data manipulation
+library(gapminder) # contains the dataset
+ggplot(
+  data = filter(gapminder, year == 1952), 
+  mapping = aes(x = lifeExp, y = gdpPercap)
+) +
+  geom_point() +
+  labs(
+    x = "Life expectancy (years)",
+    y = "GDP per capita (USD)",
+    title = "Relationship between life expectancy and GDP in 1952"
+  )
+```
+
+Questions:
+
+- Which data subset is being plotted?
+- What does each part of the code do?
+- Which variables map to which **aes**thetical features of the plot?
+
+## ggplot2 basics
+
+The first step in creating a `ggplot2` graph is to define a `ggplot` object with the `ggplot()` function.
+The main arguments are:
+
+- `data`: the data frame associated with the graph
+- `mapping`: the **aes**thetical mapping, i.e., which variables from the data will be mapped
+to the x- or y-position, color, shape, transparency, etc.
+
+After initializing the graph, we continuously stack **layers** on top of (like LEGO blocks) with the `+` operator.
+
+![](figures/02-ggplot2_syntax.png)
+
+For example, we would like to create a graph from the Gapminder data, showing `gdpPercap` and `lifeExp` as scatterplot **geom**etry.
+
+```{r}
+#| label: first-ggplot
+ggplot(
+  data = gapminder,
+  mapping = aes(x = gdpPercap, y = lifeExp)
+) +
+  geom_point()
+```
+
+### Step by step
+
+#### Step 1
+
+```{r}
+#| label: gap-1
+ggplot(data = gapminder)
+```
+
+#### Step 2
+
+```{r}
+#| label: gap-2
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+```
+
+#### Step 3a
+
+```{r}
+#| label: gap-3a
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() # adds a scatterplot layer
+```
+
+#### Step 3b
+
+```{r}
+#| label: gap-3b
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
+  geom_smooth(method = "lm") # adds a trend line (lm = linear regression fit)
+```
+
+#### Step 4
+
+```{r}
+#| label: gap-4
+# Add both scatterplot layer and trend line layer
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+## Setting layer arguments
+
+Layer arguments that are **independent from the underlying data frame** are
+set outside of `aes()`.
+
+For example, we can make some cosmetic adjustments by setting the points' **color**
+and transparency (**alpha**), the line's color and **size**. Further, we remove the
+confidence interval (**se**) of the linear regression fit.
+
+```{r}
+#| label: non-aes
+ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.3, color = "cornflowerblue") + 
+  geom_smooth(method = "lm", color = "firebrick", se = FALSE, linewidth = 2) +
+  scale_x_log10()
+```
+
+## Axis scales
+
+```{r}
+#| label: scale-0
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+The x- and y-axis scales default to `scale_x_continuous()` and
+`scale_y_continuous()`, respectively. 
+We do not need to explicitly add these layers to the graph.
+
+```{r}
+#| label: scale-1
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_continuous()
+```
+
+Let us change the x-axis range to lie between 200 and 50,000:
+
+```{r}
+#| label: scale-2
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_continuous(limits = c(200, 50000))
+```
+
+Note that we receive a warning. 
+There are 6 observations that are outside the specified x-axis range.  
+Since the graph reveals a log relationship between GDP per capita and life expectancy, we may improve it by log-transforming the x-axis.
+
+```{r}
+#| label: scale-3
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+The x-axis labels in scientific location don't look particularly pretty.  
+We would like to make the following changes:
+
+- make the x-axis labels more intuitive
+- set custom axis breaks at 500, 5,000 and 50,000
+
+```{r}
+#| label: scale-4
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_log10(
+    breaks = c(500, 5000, 50000), # ticks pos.
+    labels = scales::label_number(big.mark = ",") # use commas to separate thousands
+  )
+```
+
+## Color scales
+
+Similarly to the axis scales, we do not need to explicitly add a color scale layer to the graph. For continuous columns, `scale_color_continuous()` / `scale_fill_continuous()` are used. For discrete columns, `scale_color_discrete()` / `scale_fill_discrete()` are used.
+
+```{r}
+#| label: scale-fill-0
+ggplot(gapminder, aes(x = continent, fill = continent)) +
+  geom_bar()
+```
+
+We can replace the default color scale by adding a different `scale_fill_*`
+layer. 
+Here, we use the palette `"Accent"` from [ColorBrewer](https://colorbrewer2.org/).
+
+```{r}
+#| label: scale-fill-1
+ggplot(gapminder, aes(x = continent, fill = continent)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Accent") 
+```
+
+## Facetting
+
+One of the highlights of `ggplot2` is the possibility to easily **facet** a plot,
+i.e. splitting the data onto multiple panels. Faceting allows to compactly present a lot of information by **stratifying by a third variable**. Also, faceting often is a remedy against **overplotting**.
+
+The `facet_wrap()` function creates subpanels.  
+Notation: `~`(tilde) comma-separated names of variables
+
+```{r}
+#| label: facet-1
+ggplot(data = gapminder, mapping = aes(x = year, y = gdpPercap)) +
+geom_line(aes(group = country)) +
+  scale_y_log10() +
+  facet_wrap(~ continent)
+```
+
+Some adjustments:
+
+- Ignore Oceania
+- Add a trend curve showing the average development per continent
+- Reduce the number of x-axis breaks
+- Show all facets in one row
+- Prettify y-axis labels
+- Optimize axis titles
+
+```{r}
+#| label: facet-2
+ggplot(
+  data = gapminder |> filter(continent != "Oceania"), 
+  aes(x = year, y = gdpPercap)
+  ) + 
+  geom_line(aes(group = country)) +
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_x_continuous(breaks = seq(1960, 2000, 20)) + 
+  scale_y_log10(labels = scales::dollar) +
+  facet_wrap(~ continent, nrow = 1) +
+  labs(x = NULL, y = "GDP per capita")
+```
+
+## Themes
+
+Use a theme layer to change style aspects of the plot that are not related to
+the data.
+
+Apply a build-in theme with `theme_<NAME>` to quickly change the overall appearance.
+
+### `theme_gray()`
+
+> "The signature ggplot2 theme with a gray background and white gridlines, designed to put the data forward yet make comparisons easy." &mdash; `?theme_gray`
+
+```{r}
+#| label: themes-1
+p <- ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent)) +
+  geom_point()
+p # default theme: theme_gray()
+```
+
+### `theme_bw()`
+
+> "The classic dark-on-light ggplot2 theme. May work better for presentations displayed with a projector." &mdash; `?theme_bw`
+
+```{r}
+#| label: themes-2
+p + theme_bw()
+```
+
+### `theme_minimal()`
+
+> "A minimalistic theme with no background annotations." &mdash; `?theme_minimal`
+
+```{r}
+#| label: themes-3
+p + theme_minimal()
+```
+
+### `theme_void()`
+
+> "A completely empty theme." &mdash; `?theme_void`
+
+```{r}
+#| label: themes-4
+p + theme_void()
+```
+
+### Modifying base theme properties
+
+Every theme has four fundamental properties:
+
+- `base_size` = 11 (in pt)
+- `base_family` = "sans" (sans serif font)
+- `base_line_size = base_size/22` (width of a line in pt)
+- `base_rect_size = base_size/22` (line width of borders and backgrounds)
+
+Custom theme settings:
+
+```{r}
+#| label: themes-5
+p + theme_minimal(base_size = 24, base_family = "serif", base_line_size = 4)
+```
+
+### Modify individual theme elements: `theme(<ELEMENT> = ...)`
+
+Make axes titles red and right-aligned.
+
+```{r}
+#| label: themes-6
+p + theme_minimal(base_size = 24) +
+  theme(axis.title = element_text(color = "red", hjust = 1))
+```
+
+## BONUS: A publication-ready plot
+
+```{r}
+#| label: bonus
+# Countries to be highlighted
+ctr <- c("Afghanistan", "Argentina", "Bangladesh", 
+         "Botswana", "Brazil", "Canada", "China",  
+         "Cameroon", "Germany", "Greece", "India", 
+         "Iraq", "Italy", "Japan", "Malaysia", 
+         "New Zealand",  "Norway", "Rwanda", "Singapore", 
+         "South Africa", "Sudan", "United States", "Venezuela")
+
+g07 <- filter(gapminder, year == 2007)
+
+ggplot(g07, aes(x = gdpPercap, y = lifeExp)) + 
+  geom_smooth(formula = y ~ log(x), size = 1.5, color = "red") +
+  geom_point(aes(color = continent), shape = 1, size = 2, stroke = 1.5) +
+  ggrepel::geom_text_repel(
+    data = filter(g07, country %in% ctr), 
+    aes(label = country), 
+    size = 12/.pt, fontface = "italic",
+    min.segment.length = 0
+  ) +
+  scale_color_brewer(palette = "Set2") +
+  scale_x_continuous(
+    limits = c(0, 52000), 
+    expand = expansion(mult = 0, add = 0), 
+    labels = scales::dollar
+  ) +
+  labs(
+    x = "Average GDP/capita", y = "Average life expectancy [years]", 
+    title = "Economic growth and life expectancy in 2007", 
+    caption = "Source: Gapminder",
+    color = NULL
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "top") +
+  theme(axis.line = element_line(size = 0.4)) +
+  theme(axis.line.y = element_blank()) +
+  theme(axis.ticks = element_line(size = 0.3)) +
+  theme(axis.ticks.y = element_blank()) +
+  theme(panel.grid.minor = element_blank()) +
+  theme(panel.grid.major.x = element_blank()) +
+  theme(panel.grid.major.y = element_line(color = "gray60", size = 0.5))
+
+ggsave(filename = "country-dev-2007.png", width = 9, height = 5, dpi = 300, bg = "white")
+```
+
+## ggplot2 extensions
+
+<https://exts.ggplot2.tidyverse.org/gallery/>
+
+Some highlights:
+
+* patchwork
+* ggiraph
+* ggrepel
+* gganimate
+* ggthemes
+
